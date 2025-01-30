@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restaurant Picker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        h1 {
+            color: #333;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        p {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        async function addRestaurant() {
+            let name = document.getElementById("restaurantName").value;
+            if (!name) {
+                alert("Please enter a restaurant name.");
+                return;
+            }
+            let response = await fetch('/add', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name: name})
+            });
+            let result = await response.json();
+            alert(result.message);
+            document.getElementById("restaurantName").value = '';
+            loadRestaurants();
+        }
+
+        async function pickRestaurant() {
+            let response = await fetch('/pick');
+            let result = await response.json();
+            document.getElementById("result").innerText = result.restaurant || "No restaurants available";
+        }
+
+        async function loadRestaurants() {
+            let response = await fetch('/list');
+            let result = await response.json();
+            document.getElementById("list").innerText = "Restaurants: " + (result.restaurants.join(", ") || "None");
+        }
+    </script>
+</head>
+<body onload="loadRestaurants()">
+    <h1>Restaurant Picker</h1>
+    <input type="text" id="restaurantName" placeholder="Enter restaurant name">
+    <button onclick="addRestaurant()">Add</button>
+    <button onclick="pickRestaurant()">Pick a Random Restaurant</button>
+    <p id="result"></p>
+    <h3>Restaurant List</h3>
+    <p id="list"></p>
+</body>
+</html>
